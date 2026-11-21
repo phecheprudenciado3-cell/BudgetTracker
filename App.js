@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Text } from "react-native";
 
@@ -19,21 +18,22 @@ export default function App() {
           screenOptions={{
             headerShown: false,
 
-            tabBarActiveTintColor: "#5945D8",
+            tabBarActiveTintColor: "#3563F5",
             tabBarInactiveTintColor: "#9CA3AF",
 
             tabBarStyle: {
-              height: 68,
+              height: 65,
               paddingTop: 8,
               paddingBottom: 8,
               backgroundColor: "#FFFFFF",
-              borderTopColor: "#EAE7F5",
-              elevation: 10,
+              borderTopWidth: 1,
+              borderTopColor: "#EDF0F5",
+              elevation: 0,
             },
 
             tabBarLabelStyle: {
-              fontSize: 12,
-              fontWeight: "700",
+              fontSize: 11,
+              fontWeight: "600",
             },
           }}
         >
@@ -41,9 +41,9 @@ export default function App() {
             name="Dashboard"
             component={DashboardTab}
             options={{
-              tabBarIcon: ({ focused }) => (
-                <Text style={{ fontSize: 21 }}>
-                  {focused ? "⌂" : "⌂"}
+              tabBarIcon: ({ color }) => (
+                <Text style={{ color, fontSize: 21 }}>
+                  ⌂
                 </Text>
               ),
             }}
@@ -53,9 +53,9 @@ export default function App() {
             name="Expenses"
             component={ExpensesTab}
             options={{
-              tabBarIcon: ({ focused }) => (
-                <Text style={{ fontSize: 21 }}>
-                  {focused ? "▣" : "▣"}
+              tabBarIcon: ({ color }) => (
+                <Text style={{ color, fontSize: 20 }}>
+                  ▤
                 </Text>
               ),
             }}

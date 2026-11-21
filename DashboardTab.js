@@ -37,49 +37,43 @@ export default function DashboardTab() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>MY FINANCES</Text>
           <Text style={styles.title}>MyBudget</Text>
           <Text style={styles.subtitle}>
             Track. Plan. Save.
           </Text>
         </View>
 
-        <View style={styles.logo}>
-          <Text style={styles.logoText}>₱</Text>
+        <View style={styles.settingsIcon}>
+          <Text style={styles.settingsText}>⚙</Text>
         </View>
       </View>
 
-      {/* Balance Card */}
+      {/* Remaining Balance */}
       <View style={styles.balanceCard}>
         <Text style={styles.balanceLabel}>
-          REMAINING BALANCE
+          Remaining Balance
         </Text>
 
-        <Text style={styles.balanceAmount}>
+        <Text
+          style={styles.balanceAmount}
+          adjustsFontSizeToFit
+          numberOfLines={1}
+        >
           {formatMoney(remainingBalance)}
         </Text>
 
-        <View style={styles.balanceFooter}>
-          <View style={styles.statusDot} />
-          <Text style={styles.balanceNote}>
-            {remainingBalance > 0
-              ? "You're within your budget!"
-              : remainingBalance === 0
-              ? "Your budget is fully used."
-              : "You have exceeded your budget."}
-          </Text>
-        </View>
-
-        <Text style={styles.watermark}>₱</Text>
+        <Text style={styles.balanceNote}>
+          {remainingBalance > 0
+            ? "You're within your budget."
+            : remainingBalance === 0
+            ? "Your budget is fully used."
+            : "You have exceeded your budget."}
+        </Text>
       </View>
 
-      {/* Summary Cards */}
+      {/* Summary */}
       <View style={styles.summaryRow}>
         <View style={styles.summaryCard}>
-          <View style={styles.iconCircle}>
-            <Text style={styles.iconText}>▤</Text>
-          </View>
-
           <Text style={styles.cardLabel}>
             Total Budget
           </Text>
@@ -90,10 +84,6 @@ export default function DashboardTab() {
         </View>
 
         <View style={styles.summaryCard}>
-          <View style={[styles.iconCircle, styles.redCircle]}>
-            <Text style={styles.redIcon}>↗</Text>
-          </View>
-
           <Text style={styles.cardLabel}>
             Total Expenses
           </Text>
@@ -105,17 +95,13 @@ export default function DashboardTab() {
       </View>
 
       {/* Spending Overview */}
-      <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>
-          Spending Overview
-        </Text>
-
-        <View style={styles.progressInfo}>
-          <Text style={styles.progressLabel}>
-            Budget Used
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>
+            Spending Overview
           </Text>
 
-          <Text style={styles.progressValue}>
+          <Text style={styles.percentage}>
             {percentage.toFixed(0)}%
           </Text>
         </View>
@@ -129,12 +115,12 @@ export default function DashboardTab() {
           />
         </View>
 
-        <View style={styles.progressLegend}>
-          <Text style={styles.legendText}>
+        <View style={styles.progressLabels}>
+          <Text style={styles.smallText}>
             Spent: {formatMoney(totalExpenses)}
           </Text>
 
-          <Text style={styles.legendText}>
+          <Text style={styles.smallText}>
             Left: {formatMoney(remainingBalance)}
           </Text>
         </View>
@@ -146,32 +132,33 @@ export default function DashboardTab() {
           Recent Expenses
         </Text>
 
-        <Text style={styles.recentCount}>
+        <Text style={styles.itemCount}>
           {expenses.length} items
         </Text>
       </View>
 
       {expenses.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={styles.emptyIcon}>▤</Text>
           <Text style={styles.emptyTitle}>
             No expenses yet
           </Text>
+
           <Text style={styles.emptyText}>
-            Your recent expenses will appear here.
+            Your transactions will appear here.
           </Text>
         </View>
       ) : (
         expenses.slice(-3).reverse().map((item) => (
           <View key={item.id} style={styles.expenseItem}>
             <View style={styles.expenseIcon}>
-              <Text style={styles.expenseIconText}>₱</Text>
+              <Text style={styles.iconText}>₱</Text>
             </View>
 
             <View style={styles.expenseDetails}>
               <Text style={styles.expenseName}>
                 {item.title}
               </Text>
+
               <Text style={styles.expenseDate}>
                 {item.date}
               </Text>
@@ -185,7 +172,7 @@ export default function DashboardTab() {
       )}
 
       <Text style={styles.footer}>
-        MyBudget • Manage your money wisely
+        MyBudget · Every peso counts.
       </Text>
     </ScrollView>
   );
@@ -194,7 +181,7 @@ export default function DashboardTab() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F7F6FC",
+    backgroundColor: "#F7F8FA",
   },
 
   content: {
@@ -210,202 +197,143 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
 
-  greeting: {
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 2,
-    color: "#8B80B9",
-  },
-
   title: {
-    fontSize: 30,
+    fontSize: 27,
     fontWeight: "800",
-    color: "#211B42",
-    marginTop: 5,
+    color: "#172033",
   },
 
   subtitle: {
-    fontSize: 14,
-    color: "#89839F",
-    marginTop: 3,
+    fontSize: 13,
+    color: "#8B95A5",
+    marginTop: 5,
   },
 
-  logo: {
-    width: 53,
-    height: 53,
-    borderRadius: 17,
-    backgroundColor: "#5945D8",
-    alignItems: "center",
+  settingsIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
     justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#EDF0F5",
   },
 
-  logoText: {
-    color: "#FFFFFF",
-    fontSize: 28,
-    fontWeight: "bold",
+  settingsText: {
+    fontSize: 20,
+    color: "#64748B",
   },
 
   balanceCard: {
-    backgroundColor: "#5945D8",
-    padding: 24,
-    borderRadius: 23,
-    marginBottom: 20,
-    overflow: "hidden",
+    backgroundColor: "#3563F5",
+    padding: 23,
+    borderRadius: 18,
+    marginBottom: 18,
   },
 
   balanceLabel: {
-    color: "#DCD6FF",
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 1.5,
+    color: "#E6ECFF",
+    fontSize: 13,
+    fontWeight: "500",
   },
 
   balanceAmount: {
     color: "#FFFFFF",
-    fontSize: 36,
+    fontSize: 35,
     fontWeight: "800",
-    marginTop: 13,
-  },
-
-  balanceFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 20,
-  },
-
-  statusDot: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: "#55E6A5",
-    marginRight: 9,
+    marginTop: 12,
   },
 
   balanceNote: {
-    color: "#FFFFFF",
+    color: "#E6ECFF",
     fontSize: 12,
-  },
-
-  watermark: {
-    position: "absolute",
-    right: 20,
-    top: 25,
-    fontSize: 100,
-    fontWeight: "bold",
-    color: "rgba(255,255,255,0.10)",
+    marginTop: 12,
   },
 
   summaryRow: {
     flexDirection: "row",
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 25,
   },
 
   summaryCard: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    padding: 16,
-    borderRadius: 18,
+    padding: 17,
+    borderRadius: 15,
     borderWidth: 1,
-    borderColor: "#EEEAF8",
-  },
-
-  iconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: "#EEEAFE",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 13,
-  },
-
-  redCircle: {
-    backgroundColor: "#FEECEC",
-  },
-
-  iconText: {
-    fontSize: 21,
-    color: "#5945D8",
-  },
-
-  redIcon: {
-    fontSize: 23,
-    color: "#E5484D",
+    borderColor: "#EDF0F5",
   },
 
   cardLabel: {
-    color: "#89839F",
     fontSize: 12,
+    color: "#8B95A5",
   },
 
   budgetAmount: {
-    color: "#211B42",
     fontSize: 19,
+    color: "#172033",
     fontWeight: "800",
-    marginTop: 7,
+    marginTop: 10,
   },
 
   expenseAmount: {
-    color: "#E5484D",
     fontSize: 19,
+    color: "#E5484D",
     fontWeight: "800",
-    marginTop: 7,
+    marginTop: 10,
   },
 
-  sectionCard: {
+  section: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 20,
+    padding: 18,
+    borderRadius: 15,
     borderWidth: 1,
-    borderColor: "#EEEAF8",
-    marginBottom: 22,
+    borderColor: "#EDF0F5",
+    marginBottom: 26,
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 17,
   },
 
   sectionTitle: {
-    color: "#211B42",
-    fontSize: 17,
-    fontWeight: "800",
+    fontSize: 16,
+    color: "#172033",
+    fontWeight: "700",
   },
 
-  progressInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 22,
-    marginBottom: 10,
-  },
-
-  progressLabel: {
-    color: "#89839F",
-    fontSize: 13,
-  },
-
-  progressValue: {
-    color: "#5945D8",
+  percentage: {
+    color: "#3563F5",
+    fontSize: 15,
     fontWeight: "800",
   },
 
   progressBackground: {
-    height: 10,
-    backgroundColor: "#EEEAF8",
+    height: 8,
+    backgroundColor: "#E9EDF5",
     borderRadius: 10,
     overflow: "hidden",
   },
 
   progressFill: {
-    height: 10,
-    backgroundColor: "#5945D8",
+    height: 8,
+    backgroundColor: "#3563F5",
     borderRadius: 10,
   },
 
-  progressLegend: {
+  progressLabels: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 13,
   },
 
-  legendText: {
-    color: "#89839F",
+  smallText: {
+    color: "#8B95A5",
     fontSize: 11,
   },
 
@@ -413,61 +341,59 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 13,
+    marginBottom: 14,
   },
 
-  recentCount: {
-    color: "#8B80B9",
+  itemCount: {
+    color: "#8B95A5",
     fontSize: 12,
   },
 
   emptyCard: {
     backgroundColor: "#FFFFFF",
     padding: 25,
+    borderRadius: 15,
     alignItems: "center",
-    borderRadius: 18,
-  },
-
-  emptyIcon: {
-    color: "#A99BEF",
-    fontSize: 32,
+    borderWidth: 1,
+    borderColor: "#EDF0F5",
   },
 
   emptyTitle: {
-    color: "#211B42",
+    color: "#172033",
     fontSize: 15,
-    fontWeight: "bold",
-    marginTop: 10,
+    fontWeight: "700",
   },
 
   emptyText: {
-    color: "#89839F",
+    color: "#8B95A5",
     fontSize: 12,
-    marginTop: 5,
+    marginTop: 7,
   },
 
   expenseItem: {
     backgroundColor: "#FFFFFF",
+    borderRadius: 14,
     padding: 14,
-    borderRadius: 15,
     marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#EDF0F5",
   },
 
   expenseIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: "#EEEAFE",
-    alignItems: "center",
+    width: 40,
+    height: 40,
+    backgroundColor: "#EEF3FF",
+    borderRadius: 12,
     justifyContent: "center",
+    alignItems: "center",
   },
 
-  expenseIconText: {
-    fontSize: 19,
-    color: "#5945D8",
-    fontWeight: "bold",
+  iconText: {
+    color: "#3563F5",
+    fontSize: 17,
+    fontWeight: "700",
   },
 
   expenseDetails: {
@@ -476,27 +402,27 @@ const styles = StyleSheet.create({
   },
 
   expenseName: {
-    color: "#211B42",
-    fontSize: 14,
+    color: "#172033",
+    fontSize: 13,
     fontWeight: "700",
   },
 
   expenseDate: {
-    color: "#A09AAF",
+    color: "#8B95A5",
     fontSize: 11,
     marginTop: 4,
   },
 
   expensePrice: {
     color: "#E5484D",
-    fontWeight: "800",
     fontSize: 13,
+    fontWeight: "700",
   },
 
   footer: {
-    color: "#A09AAF",
-    fontSize: 11,
+    color: "#A0A8B5",
     textAlign: "center",
-    marginTop: 20,
+    fontSize: 11,
+    marginTop: 22,
   },
 });

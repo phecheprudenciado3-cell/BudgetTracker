@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Modal,
   StyleSheet,
 } from "react-native";
 
@@ -18,6 +19,8 @@ export default function ExpensesTab() {
     addExpense,
     isSaving,
     error,
+    success,
+    clearMessages,
   } = useContext(BudgetContext);
 
   const [title, setTitle] = useState("");
@@ -26,9 +29,9 @@ export default function ExpensesTab() {
   const handleAddExpense = () => {
     const expenseAmount = Number(amount);
 
-    const success = addExpense(title, expenseAmount);
+    const accepted = addExpense(title, expenseAmount);
 
-    if (success) {
+    if (accepted) {
       setTitle("");
       setAmount("");
     }
@@ -40,170 +43,186 @@ export default function ExpensesTab() {
     });
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-    >
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>
-            TRANSACTIONS
-          </Text>
-
-          <Text style={styles.title}>
-            My Expenses
-          </Text>
+    <View style={styles.screen}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>My Expenses</Text>
 
           <Text style={styles.subtitle}>
             Add and manage your expenses.
           </Text>
         </View>
 
-        <View style={styles.headerIcon}>
-          <Text style={styles.plus}>+</Text>
-        </View>
-      </View>
+        {/* Expense Form */}
+        <View style={styles.formCard}>
+          <Text style={styles.formTitle}>
+            New Expense
+          </Text>
 
-      {/* Expense Form */}
-      <View style={styles.formCard}>
-        <Text style={styles.formTitle}>
-          Add New Expense
-        </Text>
-
-        <Text style={styles.label}>
-          EXPENSE NAME
-        </Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="e.g. Food, Transportation"
-          placeholderTextColor="#A49DB8"
-          value={title}
-          onChangeText={setTitle}
-          editable={!isSaving}
-        />
-
-        <Text style={styles.label}>
-          AMOUNT
-        </Text>
-
-        <View style={styles.amountInputContainer}>
-          <Text style={styles.currency}>₱</Text>
+          <Text style={styles.label}>
+            Expense Name
+          </Text>
 
           <TextInput
-            style={styles.amountInput}
-            placeholder="0.00"
-            placeholderTextColor="#A49DB8"
-            keyboardType="decimal-pad"
-            value={amount}
-            onChangeText={setAmount}
+            style={styles.input}
+            placeholder="e.g. Food"
+            placeholderTextColor="#A0A8B5"
+            value={title}
+            onChangeText={(value) => {
+              setTitle(value);
+              clearMessages();
+            }}
             editable={!isSaving}
           />
-        </View>
 
-        <TouchableOpacity
-          style={[
-            styles.button,
-            isSaving && styles.disabledButton,
-          ]}
-          onPress={handleAddExpense}
-          disabled={isSaving}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.buttonText}>
-            {isSaving ? "Saving..." : "+  Add Expense"}
+          <Text style={styles.label}>
+            Amount
           </Text>
-        </TouchableOpacity>
 
-        {isSaving && (
-          <View style={styles.loadingContainer}>
-            <View style={styles.loadingDot} />
+          <View style={styles.amountContainer}>
+            <Text style={styles.currency}>₱</Text>
+
+            <TextInput
+              style={styles.amountInput}
+              placeholder="0.00"
+              placeholderTextColor="#A0A8B5"
+              keyboardType="decimal-pad"
+              value={amount}
+              onChangeText={(value) => {
+                setAmount(value);
+                clearMessages();
+              }}
+              editable={!isSaving}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.button,
+              isSaving && styles.disabledButton,
+            ]}
+            onPress={handleAddExpense}
+            disabled={isSaving}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.buttonText}>
+              {isSaving ? "Saving..." : "+  Add Expense"}
+            </Text>
+          </TouchableOpacity>
+
+          {isSaving && (
             <Text style={styles.loadingText}>
               Saving your expense...
             </Text>
-          </View>
-        )}
+          )}
 
-        {!!error && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>
-              {error}
-            </Text>
-          </View>
-        )}
-      </View>
+          {!!error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>
+                {error}
+              </Text>
+            </View>
+          )}
+        </View>
 
-      {/* Expense History */}
-      <View style={styles.historyHeader}>
-        <Text style={styles.historyTitle}>
-          Expense History
-        </Text>
+        {/* Expense History */}
+        <View style={styles.historyHeader}>
+          <Text style={styles.historyTitle}>
+            Expense History
+          </Text>
 
-        <View style={styles.countBadge}>
           <Text style={styles.countText}>
             {expenses.length} items
           </Text>
         </View>
-      </View>
 
-      {expenses.length === 0 ? (
-        <View style={styles.emptyCard}>
-          <View style={styles.emptyIconContainer}>
-            <Text style={styles.emptyIcon}>₱</Text>
-          </View>
+        {expenses.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyTitle}>
+              No expenses yet
+            </Text>
 
-          <Text style={styles.emptyTitle}>
-            No expenses yet
-          </Text>
-
-          <Text style={styles.emptyText}>
-            Start tracking your spending by adding
-            your first expense above.
-          </Text>
-        </View>
-      ) : (
-        expenses.slice().reverse().map((item) => (
-          <View
-            key={item.id}
-            style={styles.expenseItem}
-          >
-            <View style={styles.expenseIcon}>
-              <Text style={styles.expenseIconText}>
-                ₱
-              </Text>
-            </View>
-
-            <View style={styles.expenseDetails}>
-              <Text style={styles.expenseName}>
-                {item.title}
-              </Text>
-
-              <Text style={styles.expenseDate}>
-                {item.date}
-              </Text>
-            </View>
-
-            <Text style={styles.expenseAmount}>
-              -{formatMoney(item.amount)}
+            <Text style={styles.emptyText}>
+              Your transactions will appear here.
             </Text>
           </View>
-        ))
-      )}
+        ) : (
+          expenses.slice().reverse().map((item) => (
+            <View
+              key={item.id}
+              style={styles.expenseItem}
+            >
+              <View style={styles.expenseIcon}>
+                <Text style={styles.iconText}>₱</Text>
+              </View>
 
-      <Text style={styles.footer}>
-        MyBudget • Every peso counts.
-      </Text>
-    </ScrollView>
+              <View style={styles.expenseDetails}>
+                <Text style={styles.expenseName}>
+                  {item.title}
+                </Text>
+
+                <Text style={styles.expenseDate}>
+                  {item.date}
+                </Text>
+              </View>
+
+              <Text style={styles.expenseAmount}>
+                -{formatMoney(item.amount)}
+              </Text>
+            </View>
+          ))
+        )}
+
+        <Text style={styles.footer}>
+          MyBudget · Every peso counts.
+        </Text>
+      </ScrollView>
+
+      {/* Success Modal */}
+      <Modal
+        visible={success}
+        transparent
+        animationType="fade"
+        onRequestClose={clearMessages}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.successCircle}>
+              <Text style={styles.successIcon}>✓</Text>
+            </View>
+
+            <Text style={styles.modalTitle}>
+              Expense Added!
+            </Text>
+
+            <Text style={styles.modalMessage}>
+              Your expense has been successfully added.
+            </Text>
+
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={clearMessages}
+            >
+              <Text style={styles.modalButtonText}>
+                OK
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F7F6FC",
+    backgroundColor: "#F7F8FA",
   },
 
   content: {
@@ -213,110 +232,83 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     marginBottom: 25,
   },
 
-  greeting: {
-    color: "#8B80B9",
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 2,
-  },
-
   title: {
-    color: "#211B42",
-    fontSize: 29,
+    fontSize: 27,
     fontWeight: "800",
-    marginTop: 5,
+    color: "#172033",
   },
 
   subtitle: {
-    color: "#89839F",
+    color: "#8B95A5",
     fontSize: 13,
-    marginTop: 5,
-  },
-
-  headerIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: "#5945D8",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  plus: {
-    color: "#FFFFFF",
-    fontSize: 30,
-    fontWeight: "400",
+    marginTop: 6,
   },
 
   formCard: {
     backgroundColor: "#FFFFFF",
     padding: 20,
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#EEEAF8",
+    borderColor: "#EDF0F5",
     marginBottom: 28,
   },
 
   formTitle: {
-    color: "#211B42",
-    fontSize: 18,
-    fontWeight: "800",
+    color: "#172033",
+    fontSize: 17,
+    fontWeight: "700",
     marginBottom: 22,
   },
 
   label: {
-    color: "#8B80B9",
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 1,
+    color: "#596579",
+    fontSize: 12,
+    fontWeight: "600",
     marginBottom: 9,
   },
 
   input: {
-    backgroundColor: "#F9F8FD",
+    backgroundColor: "#FAFBFD",
     borderWidth: 1,
-    borderColor: "#EAE6F5",
-    borderRadius: 12,
+    borderColor: "#E6EAF0",
+    borderRadius: 11,
     padding: 15,
-    color: "#211B42",
     fontSize: 14,
+    color: "#172033",
     marginBottom: 20,
   },
 
-  amountInputContainer: {
+  amountContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F9F8FD",
+    backgroundColor: "#FAFBFD",
     borderWidth: 1,
-    borderColor: "#EAE6F5",
-    borderRadius: 12,
+    borderColor: "#E6EAF0",
+    borderRadius: 11,
     paddingHorizontal: 15,
     marginBottom: 22,
   },
 
   currency: {
-    color: "#5945D8",
-    fontSize: 19,
-    fontWeight: "800",
+    fontSize: 17,
+    color: "#3563F5",
+    fontWeight: "700",
   },
 
   amountInput: {
     flex: 1,
     padding: 15,
-    color: "#211B42",
-    fontSize: 16,
+    fontSize: 15,
+    color: "#172033",
   },
 
   button: {
-    backgroundColor: "#5945D8",
-    padding: 17,
-    borderRadius: 13,
+    backgroundColor: "#3563F5",
+    padding: 16,
+    borderRadius: 11,
     alignItems: "center",
   },
 
@@ -326,35 +318,22 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "800",
-  },
-
-  loadingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 15,
-  },
-
-  loadingDot: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: "#5945D8",
-    marginRight: 8,
+    fontSize: 14,
+    fontWeight: "700",
   },
 
   loadingText: {
-    color: "#8B80B9",
+    color: "#3563F5",
+    textAlign: "center",
     fontSize: 12,
+    marginTop: 13,
   },
 
   errorContainer: {
-    backgroundColor: "#FFF0F0",
+    backgroundColor: "#FFF1F1",
+    borderRadius: 9,
     padding: 12,
-    borderRadius: 10,
-    marginTop: 15,
+    marginTop: 14,
   },
 
   errorText: {
@@ -371,87 +350,61 @@ const styles = StyleSheet.create({
   },
 
   historyTitle: {
-    color: "#211B42",
-    fontSize: 18,
-    fontWeight: "800",
-  },
-
-  countBadge: {
-    backgroundColor: "#EEEAFE",
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 20,
+    fontSize: 17,
+    color: "#172033",
+    fontWeight: "700",
   },
 
   countText: {
-    color: "#5945D8",
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: 12,
+    color: "#8B95A5",
   },
 
   emptyCard: {
     backgroundColor: "#FFFFFF",
-    padding: 30,
-    borderRadius: 18,
+    padding: 27,
+    borderRadius: 14,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#EEEAF8",
-  },
-
-  emptyIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 20,
-    backgroundColor: "#EEEAFE",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  emptyIcon: {
-    color: "#5945D8",
-    fontSize: 30,
-    fontWeight: "bold",
+    borderColor: "#EDF0F5",
   },
 
   emptyTitle: {
-    color: "#211B42",
-    fontSize: 16,
-    fontWeight: "800",
-    marginTop: 15,
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#172033",
   },
 
   emptyText: {
-    color: "#89839F",
     fontSize: 12,
-    textAlign: "center",
-    lineHeight: 19,
-    marginTop: 8,
+    color: "#8B95A5",
+    marginTop: 7,
   },
 
   expenseItem: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 15,
-    padding: 15,
-    marginBottom: 11,
+    padding: 14,
+    borderRadius: 13,
+    marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#F0EDF7",
+    borderColor: "#EDF0F5",
   },
 
   expenseIcon: {
-    width: 43,
-    height: 43,
-    borderRadius: 14,
-    backgroundColor: "#EEEAFE",
-    alignItems: "center",
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "#EEF3FF",
     justifyContent: "center",
+    alignItems: "center",
   },
 
-  expenseIconText: {
-    color: "#5945D8",
-    fontSize: 19,
-    fontWeight: "bold",
+  iconText: {
+    color: "#3563F5",
+    fontSize: 17,
+    fontWeight: "700",
   },
 
   expenseDetails: {
@@ -460,27 +413,88 @@ const styles = StyleSheet.create({
   },
 
   expenseName: {
-    color: "#211B42",
-    fontSize: 14,
+    color: "#172033",
+    fontSize: 13,
     fontWeight: "700",
   },
 
   expenseDate: {
-    color: "#A09AAF",
+    color: "#8B95A5",
     fontSize: 11,
-    marginTop: 5,
+    marginTop: 4,
   },
 
   expenseAmount: {
     color: "#E5484D",
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   footer: {
-    color: "#A09AAF",
     textAlign: "center",
+    color: "#A0A8B5",
     fontSize: 11,
     marginTop: 25,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(20, 30, 50, 0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 25,
+  },
+
+  modalCard: {
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    padding: 25,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+
+  successCircle: {
+    width: 65,
+    height: 65,
+    borderRadius: 33,
+    backgroundColor: "#DDF8E8",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 17,
+  },
+
+  successIcon: {
+    color: "#16A36A",
+    fontSize: 35,
+    fontWeight: "bold",
+  },
+
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#172033",
+  },
+
+  modalMessage: {
+    fontSize: 13,
+    color: "#697386",
+    textAlign: "center",
+    lineHeight: 20,
+    marginTop: 10,
+    marginBottom: 23,
+  },
+
+  modalButton: {
+    backgroundColor: "#3563F5",
+    padding: 15,
+    borderRadius: 11,
+    width: "100%",
+    alignItems: "center",
+  },
+
+  modalButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });

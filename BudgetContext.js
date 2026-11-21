@@ -7,6 +7,7 @@ export const BudgetProvider = ({ children }) => {
   const [expenses, setExpenses] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const totalExpenses = expenses.reduce(
     (total, expense) => total + expense.amount,
@@ -23,16 +24,17 @@ export const BudgetProvider = ({ children }) => {
       !Number.isFinite(amount) ||
       amount <= 0
     ) {
-      setError("Please enter a valid expense.");
+      setError("Please enter a valid expense and amount.");
       return false;
     }
 
     if (amount > remainingBalance) {
-      setError("Your expense exceeds your remaining budget.");
+      setError("Expense exceeds your remaining budget.");
       return false;
     }
 
     setError("");
+    setSuccess(false);
     setIsSaving(true);
 
     const newExpense = {
@@ -47,11 +49,21 @@ export const BudgetProvider = ({ children }) => {
     };
 
     setTimeout(() => {
-      setExpenses((previous) => [...previous, newExpense]);
+      setExpenses((previous) => [
+        ...previous,
+        newExpense,
+      ]);
+
       setIsSaving(false);
+      setSuccess(true);
     }, 1000);
 
     return true;
+  };
+
+  const clearMessages = () => {
+    setError("");
+    setSuccess(false);
   };
 
   return (
@@ -63,7 +75,9 @@ export const BudgetProvider = ({ children }) => {
         remainingBalance,
         isSaving,
         error,
+        success,
         addExpense,
+        clearMessages,
       }}
     >
       {children}
