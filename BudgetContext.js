@@ -1,4 +1,3 @@
-
 import React, { createContext, useState } from "react";
 
 export const BudgetContext = createContext();
@@ -19,13 +18,17 @@ export const BudgetProvider = ({ children }) => {
   const addExpense = (title, amount) => {
     if (isSaving) return false;
 
-    if (!title.trim() || !Number.isFinite(amount) || amount <= 0) {
+    if (
+      !title.trim() ||
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
       setError("Please enter a valid expense.");
       return false;
     }
 
     if (amount > remainingBalance) {
-      setError("Insufficient remaining budget.");
+      setError("Your expense exceeds your remaining budget.");
       return false;
     }
 
@@ -35,15 +38,16 @@ export const BudgetProvider = ({ children }) => {
     const newExpense = {
       id: Date.now().toString(),
       title: title.trim(),
-      amount: amount,
+      amount,
+      date: new Date().toLocaleDateString("en-PH", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
     };
 
     setTimeout(() => {
-      setExpenses((previousExpenses) => [
-        ...previousExpenses,
-        newExpense,
-      ]);
-
+      setExpenses((previous) => [...previous, newExpense]);
       setIsSaving(false);
     }, 1000);
 
